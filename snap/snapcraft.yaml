@@ -37,9 +37,16 @@ description: |
   tools. As such, users with specialized needs can leverage it to
   quickly create [entirely new history rewriting tools](https://github.com/newren/git-filter-repo/blob/main/contrib/filter-repo-demos).
 
+  **Snap-specific information**
+
+  This is NOT an official distribution of git filter-repo, refer the
+  snap's own issue tracker for support:
+
+  https://github.com/Lin-Buo-Ren/git-filter-repo-snap/issues
+
 # The path of icon to represent the snap, relative to the source tree directory
 # Only PNG or SVG image is supported, dimension must be greater than 256x256px
-icon: snap/gui/git-filter-repo.png
+icon: snap/gui/placeholder.png
 
 # The license of this application, in SPDX format
 # NOTE: Currently only supports SPDX 2.1 license expressions, as described in Appendix IV of
@@ -82,6 +89,10 @@ confinement: strict
 # snaps can be promoted to `candidate` and `stable` channels
 grade: stable
 
+package-repositories:
+ - type: apt
+   ppa: git-core/ppa
+
 # Run `snapcraft help sources` for supported keywords on pulling a part's source ingredients
 # Run `snapcraft plugins` for supported build helper plugins
 # Run `snapcraft help plugins` for supported keywords on building a part
@@ -89,13 +100,13 @@ grade: stable
 # https://docs.snapcraft.io/scriptlets/4892
 parts:
   # Files to patch the files in the snap
-  patching:
-    source: snap/local/patching
-    plugin: dump
-    organize:
-      '*': patching/
-    prime:
-      - -*
+  # patching:
+  #   source: snap/local/patching
+  #   plugin: dump
+  #   organize:
+  #     '*': patching/
+  #   prime:
+  #     - -*
 
   # Launcher programs to fix problems at runtime
   launchers:
@@ -107,85 +118,92 @@ parts:
       - -bin/README.*
 
   # Programs to modify the behavior of each step of the snapcraft lifecycles
-  scriptlets:
-    source: snap/local/scriptlets
-    plugin: dump
-    organize:
-      '*': scriptlets/
-    prime:
-      - -*
+  # scriptlets:
+  #   source: snap/local/scriptlets
+  #   plugin: dump
+  #   organize:
+  #     '*': scriptlets/
+  #   prime:
+  #     - -*
 
   # Stage snap for fixing the Glibc locales
   # https://forum.snapcraft.io/t/the-locales-launch-stage-snap/10296
-  locales-launch:
-    source: https://github.com/Lin-Buo-Ren/locales-launch.git
-    source-tag: v1.0.0
+  # locales-launch:
+  #   source: https://github.com/Lin-Buo-Ren/locales-launch.git
+  #   source-tag: v1.0.0
+  #   plugin: dump
+  #   stage-packages:
+  #     - libc-bin
+  #     - locales
+  #   stage:
+  #     - bin/locales-launch
+  #     - etc/locale.alias
+  #     - usr/bin/localedef
+  #     - usr/share/doc/locales
+  #     - usr/share/i18n
+  #     - usr/share/locale
+
+  # Check out the tagged release revision if it isn't promoted to the stable channel
+  # https://forum.snapcraft.io/t/selective-checkout-check-out-the-tagged-release-revision-if-it-isnt-promoted-to-the-stable-channel/10617
+  selective-checkout:
+    source: https://github.com/Lin-Buo-Ren/selective-checkout.git
+    source-tag: v2.0.2
     plugin: dump
-    stage-packages:
-      - libc-bin
-      - locales
-    stage:
-      - bin/locales-launch
-      - etc/locale.alias
-      - usr/bin/localedef
-      - usr/share/doc/locales
-      - usr/share/i18n
-      - usr/share/locale
-
-  # Remote part for support of various desktop technologies
-  # Refer: https://github.com/ubuntu/snapcraft-desktop-helpers/blob/master/snapcraft.yaml
-  desktop-gnome-platform:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-depth: 1
-    source-subdir: gtk
-
-    plugin: make
     build-packages:
-      - gcc
-    override-build: |
-      snapcraftctl build
-      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
+      # Scriptlet dependencies
+      - curl
+      - jq
+      - sed
 
-  # Integrate custom dialogs in your snap - doc - snapcraft.io
-  # https://forum.snapcraft.io/t/integrate-custom-dialogs-in-your-snap/10825
-  zenity-integration:
-    plugin: nil
-    stage-snaps:
-      - zenity-integration
+      # Uncomment the VCS your main part is using
+      #- git
+      #- mercurial
+      #- subversion
+    stage:
+      - scriptlets/selective-checkout
+    prime:
+      - -*
 
   main:
     after:
       # for patch-desktop-entries.*
-      - patching
+      #- patching
 
-      # for override-pull script
-      - scriptlets
+      # For the selective-checkout scriptlet
+      - selective-checkout
 
-    source: .
-    #source-type:
-    #source-branch:
-    #source-tag:
-    #source-depth:
+    source: https://github.com/newren/git-filter-repo.git
     override-pull: |
       set -o nounset
 
       snapcraftctl pull
 
-      "${SNAPCRAFT_STAGE}"/scriptlets/main-adopt-info
+      "${SNAPCRAFT_STAGE}"/scriptlets/selective-checkout \
+        --append-packaging-revision
 
     plugin: dump
     organize:
       git-filter-repo: bin/
+      contrib/filter-repo-demos/bfg-ish: bin/
     stage:
       - bin/*
-
     override-prime: |
-      set \
-        -o nounset
-
       snapcraftctl prime
+      ln -sf git-filter-repo "${SNAPCRAFT_PRIME}"/bin/git_filter_repo.py
 
-      "${SNAPCRAFT_STAGE}"/patching/patch-desktop-entries.bash
+  git:
+    plugin: nil
+    stage-packages:
+      - git
+
+  # The git-launch launcher: Fix Git functionality in the snap runtime environment
+  # https://forum.snapcraft.io/t/the-git-launch-launcher-fix-git-functionality-in-the-snap-runtime-environment/11742
+  git-launch:
+    source: https://github.com/Lin-Buo-Ren/git-launch.git
+    source-tag: v1.0.0
+    plugin: dump
+    stage:
+      - bin/*
 
 # Apps that are exposed by the snap package
 # If the _app_name_ is identical with the _snap_name_ it can be directly run
@@ -199,16 +217,36 @@ apps:
 
     # An *relative path* to an executable file root from the `prime` directory to be executed, and its command-line arguments
     # NOTE: The right angle bracket at the beginning of the value of the `command` keyword starts a YAML folded style block scalar, refer the following spec document for more info: http://yaml.org/spec/1.2/spec.html#id2796251
-    command: bin/git-filter-repo
+    # WORKAROUND: LP Bug #1820055
+    #command: bin/git-filter-repo-launch
+    command: git-filter-repo
 
     # The commands that are run, in order, before running the one specified by the `command` key
     command-chain:
-      - bin/desktop-launch
-      - bin/git-filter-repo-launch
+      - bin/git-launch
+      - bin/snap-maintenance-launch
 
-    # If the providing part of the app. has a desktop entry, specify its path relative to the `prime` directory.
-    # If the packaging target doesn't provide a desktop entry, ignore the `desktop` key and implement a desktop entry in `/snap/gui`
-    #desktop: share/applications/git-filter-repo.desktop
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+
+  bfg-ish:
+    # The adapter to set up runtime environment at the launch of the snap
+    # NOTE: The `command-chain` property is only supported by the `full` adapter
+    adapter: full
+
+    # An *relative path* to an executable file root from the `prime` directory to be executed, and its command-line arguments
+    # NOTE: The right angle bracket at the beginning of the value of the `command` keyword starts a YAML folded style block scalar, refer the following spec document for more info: http://yaml.org/spec/1.2/spec.html#id2796251
+    command: bfg-ish
+
+    # The commands that are run, in order, before running the one specified by the `command` key
+    command-chain:
+      - bin/git-launch
+      - bin/snap-maintenance-launch
+
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
 
 # Refer the following documentation for asserting interface plugs and slots in a security confined snap:
 # Interface management - doc - snapcraft.io
@@ -217,54 +255,8 @@ apps:
 # https://docs.snapcraft.io/supported-interfaces/7744
 # Non-A/C: Non-autoconnect interface
 plugs:
-  # Common desktop interfaces
-  # https://forum.snapcraft.io/t/the-desktop-interfaces/2042
-  desktop:
-  desktop-legacy:
-  unity7:
-  wayland:
-
-  # GNOME and Gtk runtime via content sharing
-  # https://forum.snapcraft.io/t/desktop-app-support-gtk/6834
-  gnome-3-28-1804:
-    interface: content
-    target: $SNAP/gnome-platform
-    default-provider: gnome-3-28-1804
-
-  # Gtk Common Themes support
-  # https://forum.snapcraft.io/t/how-to-use-the-system-gtk-theme-via-the-gtk-common-themes-snap/6235
-  gsettings:
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
-
   # Regular files access
-  #home:
-  #removable-media: # Non-A/C
-
-  # Application-specific files access
-  # The auto-connection requires store grant
-  # https://forum.snapcraft.io/t/the-personal-files-interface/9357
-  # https://forum.snapcraft.io/t/the-system-files-interface/9358
-  #user-wide-configs:
-    #interface: personal-files
-    #read:
-      #- $HOME/.config/git-filter-repo
-  #system-wide-configs:
-    #interface: system-files
-    #read:
-      #- /etc/git-filter-repo
-
-  # Network access
-  #network:
+  home:
+  removable-media: # Non-A/C
 
 #slots:
