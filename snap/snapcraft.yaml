@@ -89,9 +89,10 @@ confinement: strict
 # snaps can be promoted to `candidate` and `stable` channels
 grade: stable
 
-package-repositories:
- - type: apt
-   ppa: git-core/ppa
+# DISABLED: Not supported by Snapcraft Build Service yet
+# package-repositories:
+#  - type: apt
+#    ppa: git-core/ppa
 
 # Run `snapcraft help sources` for supported keywords on pulling a part's source ingredients
 # Run `snapcraft plugins` for supported build helper plugins
@@ -191,7 +192,19 @@ parts:
       snapcraftctl prime
       ln -sf git-filter-repo "${SNAPCRAFT_PRIME}"/bin/git_filter_repo.py
 
+  git-stable-ppa:
+    plugin: nil
+    build-packages:
+      - software-properties-common
+    override-pull: |
+      sudo add-apt-repository \
+        --yes \
+        ppa:git-core/ppa
+      sudo apt update
+
   git:
+    after:
+      - git-stable-ppa
     plugin: nil
     stage-packages:
       - git
