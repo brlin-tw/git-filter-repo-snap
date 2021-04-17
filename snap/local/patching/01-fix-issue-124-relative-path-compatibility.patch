@@ -1,0 +1,51 @@
+From 23540dd1c998207473b5d611f8e0c568fd3d2b30 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E6=9E=97=E5=8D=9A=E4=BB=81=28Buo-ren=20Lin=29?=
+ <Buo.Ren.Lin@gmail.com>
+Date: Sat, 17 Apr 2021 14:46:03 +0800
+Subject: [PATCH] Fix relative path compatibility for --replace-text and
+ bfg_args.repo
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes #203.
+
+Signed-off-by: 林博仁(Buo-ren Lin) <Buo.Ren.Lin@gmail.com>
+---
+ contrib/filter-repo-demos/bfg-ish | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/contrib/filter-repo-demos/bfg-ish b/contrib/filter-repo-demos/bfg-ish
+index 29ae8f1..51dfca4 100755
+--- a/contrib/filter-repo-demos/bfg-ish
++++ b/contrib/filter-repo-demos/bfg-ish
+@@ -371,6 +371,7 @@ class BFG_ish:
+     bfg_args = self.parse_options()
+     preserve_refs = self.get_preservation_info(bfg_args.preserve_ref_tips)
+ 
++    work_dir = os.getcwd()
+     os.chdir(bfg_args.repo)
+     bfg_args.delete_files = java_to_fnmatch_glob(bfg_args.delete_files)
+     bfg_args.delete_folders = java_to_fnmatch_glob(bfg_args.delete_folders)
+@@ -395,6 +396,8 @@ class BFG_ish:
+       extra_args += ['--preserve-commit-hashes']
+     new_replace_file = None
+     if bfg_args.replace_text:
++      if bfg_args.replace_text[0] != '/':
++        bfg_args.replace_text = work_dir + '/' + bfg_args.replace_text
+       new_replace_file = self.convert_replace_text(bfg_args.replace_text)
+       rules = fr.FilteringOptions.get_replace_text(new_replace_file)
+       self.replacement_rules = rules
+@@ -432,6 +435,9 @@ class BFG_ish:
+       if not fr.GitUtils.is_repository_bare('.'):
+         need_another_reset = True
+ 
++    if bfg_args.repo[0] != '/':
++      bfg_args.repo = os.fsencode(work_dir + '/' + os.fsdecode(bfg_args.repo))
++      
+     fr.RepoFilter.cleanup(bfg_args.repo, repack=True, reset=need_another_reset)
+ 
+ if __name__ == '__main__':
+-- 
+2.27.0
+
