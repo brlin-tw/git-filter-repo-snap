@@ -101,13 +101,13 @@ grade: stable
 # https://docs.snapcraft.io/scriptlets/4892
 parts:
   # Files to patch the files in the snap
-  patching:
-    source: snap/local/patching
-    plugin: dump
-    organize:
-      '*': patching/
-    prime:
-      - -*
+  # patching:
+  #   source: snap/local/patching
+  #   plugin: dump
+  #   organize:
+  #     '*': patching/
+  #   prime:
+  #     - -*
 
   # Launcher programs to fix problems at runtime
   launchers:
@@ -167,8 +167,8 @@ parts:
 
   main:
     after:
-      # Patches to fix the application
-      - patching
+      # for patch-desktop-entries.*
+      #- patching
 
       # For the selective-checkout scriptlet
       - selective-checkout
@@ -182,13 +182,6 @@ parts:
       "${SNAPCRAFT_STAGE}"/scriptlets/selective-checkout \
         --append-packaging-revision
 
-    override-build: |
-      set -o nounset
-
-      patch \
-        --strip=1 \
-        < "${SNAPCRAFT_STAGE}"/patching/01-fix-issue-124-relative-path-compatibility.patch
-      snapcraftctl build
     plugin: dump
     organize:
       git-filter-repo: bin/
