@@ -1,6 +1,6 @@
 # Unofficial Snap Packaging for git filter-repo
 
-This is the unofficial snap packaging for git filter-repo, [Snaps are universal Linux packages](https://snapcraft.io).
+This is the unofficial snap packaging for [git filter-repo](https://github.com/newren/git-filter-repo), [Snaps are universal Linux packages](https://snapcraft.io).
 
 Refer [snap/README.md](snap/README.md) for user-oriented information.
 

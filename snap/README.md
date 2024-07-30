@@ -6,7 +6,7 @@
 -->
 ![(Placeholder) Icon of git filter-repo](https://cdn.staticaly.com/gh/brlin-tw/snapcrafters-template-plus/bea3bc56/snap/gui/git-filter-repo.png "(Placeholder) Icon of git filter-repo")
 
-**This is the unofficial snap for git filter-repo**, *"Versatile tool for rewriting history of Git repositories"*. It works on Ubuntu, Fedora, Debian, and other major Linux distributions.
+**This is the unofficial snap for [git filter-repo](https://github.com/newren/git-filter-repo)**, *"Versatile tool for rewriting history of Git repositories"*. It works on Ubuntu, Fedora, Debian, and other major Linux distributions.
 
 <!-- Uncomment and modify this when you are provided a snap status badge
 [![Status Badge of the `git-filter-repo` Snap](https://snapcraft.io/git-filter-repo/badge.svg)](https://snapcraft.io/git-filter-repo)
