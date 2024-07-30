@@ -4,7 +4,7 @@
 	Use the Staticaly service for easy access to in-repo pictures:
 	https://www.staticaly.com/
 -->
-![(Placeholder) Icon of git filter-repo](https://cdn.staticaly.com/gh/Lin-Buo-Ren/snapcrafters-template-plus/bea3bc56/snap/gui/git-filter-repo.png "(Placeholder) Icon of git filter-repo")
+![(Placeholder) Icon of git filter-repo](https://cdn.staticaly.com/gh/brlin-tw/snapcrafters-template-plus/bea3bc56/snap/gui/git-filter-repo.png "(Placeholder) Icon of git filter-repo")
 
 **This is the unofficial snap for git filter-repo**, *"Versatile tool for rewriting history of Git repositories"*. It works on Ubuntu, Fedora, Debian, and other major Linux distributions.
 
@@ -54,12 +54,12 @@ Published for <img src="http://anything.codes/slack-emoji-for-techies/emoji/tux.
 
 ## What is NOT Working...yet 
 
-Check out the [issue tracker](https://github.com/Lin-Buo-Ren/git-filter-repo-snap/issues) for known issues.
+Check out the [issue tracker](https://github.com/brlin-tw/git-filter-repo-snap/issues) for known issues.
 -->
 
 ## Support
 
 * Report issues regarding using this snap to the issue tracker:  
-  <https://github.com/Lin-Buo-Ren/git-filter-repo-snap/issues>
+  <https://github.com/brlin-tw/git-filter-repo-snap/issues>
 * You may also post on the Snapcraft Forum, under the `snap` topic category:  
   <https://forum.snapcraft.io/c/snap>
