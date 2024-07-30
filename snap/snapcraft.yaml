@@ -197,10 +197,10 @@ parts:
     build-packages:
       - software-properties-common
     override-pull: |
-      sudo add-apt-repository \
+      add-apt-repository \
         --yes \
         ppa:git-core/ppa
-      sudo apt update
+      apt update
 
   git:
     after:
