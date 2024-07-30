@@ -1,10 +1,6 @@
 # Unofficial Snap Packaging for git filter-repo
 
-<!--
-	Use the Staticaly service for easy access to in-repo pictures:
-	https://www.staticaly.com/
--->
-![(Placeholder) Icon of git filter-repo](https://cdn.staticaly.com/gh/brlin-tw/snapcrafters-template-plus/bea3bc56/snap/gui/git-filter-repo.png "(Placeholder) Icon of git filter-repo")
+![(Placeholder) Icon of git filter-repo](https://cdn.statically.io/gh/brlin-tw/git-filter-repo-snap/7c545b5b/snap/gui/placeholder.png "(Placeholder) Icon of git filter-repo")
 
 **This is the unofficial snap for [git filter-repo](https://github.com/newren/git-filter-repo)**, *"Versatile tool for rewriting history of Git repositories"*. It works on Ubuntu, Fedora, Debian, and other major Linux distributions.
 
